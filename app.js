@@ -4,6 +4,11 @@ mongoose.connect('mongodb+srv://root:abc83213@learning.lmzd7.mongodb.net/URL?ret
 const app = express()
 const exphbs = require('express-handlebars');
 
+const lower = 'abcdefghijklmnopqrstuvwxyz'.split("")
+const upper = lower.map(i => i.toUpperCase())
+const number = '0123456789'.split("")
+let collection = lower.concat(upper,number)
+
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs' }))
 app.set('view engine', 'hbs')
 app.use(express.static('public'))
@@ -19,10 +24,16 @@ db.once('open',() => {
 })
 
 app.get('/',(req,res) => {
+    let Number = ""
+    for (let i = 0 ; i<5 ; i++){
+        Number += collection[Math.floor(Math.random()*collection.length)]
+    }
+    console.log(Number)
     res.render('index')
 })
 
 app.get('/end',(req,res) => {
+    
     res.render('end')
 })
 
