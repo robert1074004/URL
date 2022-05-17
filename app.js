@@ -5,6 +5,7 @@ mongoose.connect('mongodb+srv://root:abc83213@learning.lmzd7.mongodb.net/URL?ret
 const app = express()
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser')
+const { redirect } = require('express/lib/response')
 
 const lower = 'abcdefghijklmnopqrstuvwxyz'.split("")
 const upper = lower.map(i => i.toUpperCase())
@@ -36,16 +37,39 @@ app.post('/',(req,res) => {
         Number += collection[Math.floor(Math.random()*collection.length)]
     }
     const url = req.body.url
-    const newURL = 'http://localhost/'+Number
+    const newURL = 'http://localhost:3000/'+Number
     return URL.create({newURL:newURL,URL:url})
-    .then(() => res.redirect('/end'))
-    .catch(error => console.log(error))
+        .then(() =>  {
+            URL.find().lean()
+            .then(urls => urls.forEach(url => {
+               if (url.newURL === newURL) {
+                res.redirect(`/end/${url._id}`)
+               }
+            }))
+            })
+        .catch(error => console.log(error))
 })
 
-app.get('/end',(req,res) => {
-    
-    res.render('end')
+app.get('/end/:id',(req,res) => {
+    const id = req.params.id
+    return URL.findById(id)
+                .lean()
+                .then(url =>  res.render('end',{url}))
+                .catch(error => console.log(error))       
 })
+
+app.get('/:newURL',(req,res) => {
+    const newURL = 'http://localhost:3000/'+req.params.newURL
+    URL.find()
+        .lean()
+        .then(urls => urls.forEach(url => {
+            if (url.newURL === newURL) {
+                 res.redirect(url.URL,302)
+            }       
+            }))
+        .catch(error => console.log(error))          
+})
+
 
 app.listen(3000,() => {
     console.log('App is running on http://localhost:3000')
