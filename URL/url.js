@@ -1,9 +1,13 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const urlSchema = new Schema({
-    name: {
+    newURL: {
+        type: String,
+        requierd:true
+    },
+    URL: {
         type: String,
         requierd:true
     }
 })
-module.exports = mongoose.URL('url',urlSchema)
+module.exports = mongoose.model('url',urlSchema)
