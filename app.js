@@ -31,23 +31,45 @@ app.get('/',(req,res) => {
     res.render('index')
 })
 
+app.get('/error',(req,res) => {
+    res.render('error')
+})
+
 app.post('/',(req,res) => {
-    let Number = ""
-    for (let i = 0 ; i<5 ; i++){
-        Number += collection[Math.floor(Math.random()*collection.length)]
-    }
     const url = req.body.url
-    const newURL = 'http://localhost:3000/'+Number
-    return URL.create({newURL:newURL,URL:url})
-        .then(() =>  {
-            URL.find().lean()
-            .then(urls => urls.forEach(url => {
-               if (url.newURL === newURL) {
-                res.redirect(`/end/${url._id}`)
-               }
-            }))
-            })
+    // 檢查url是否為空白
+    if (url.trim() === '') {
+        res.redirect('error')
+    } else {
+        URL.find().lean()
+        .then(urls => {
+            // 檢查url是否重複
+            let repeat = urls.some(URL => URL.URL === url)
+            // 如果重複
+            if (repeat) {
+                let information = urls.find(URL => URL.URL === url)
+                res.redirect(`/end/${information._id}`)
+            // 如果沒重複
+            } else { 
+                let Number = ""
+                for (let i = 0 ; i<5 ; i++){
+                    Number += collection[Math.floor(Math.random()*collection.length)]
+                }
+                const newURL = 'http://localhost:3000/'+Number
+                return URL.create({newURL:newURL,URL:url})
+                    .then(() =>  {
+                        URL.find().lean()
+                        .then(urls => {
+                            let information = urls.find(url => url.newURL === newURL)
+                            res.redirect(`/end/${information._id}`)
+                        }   
+                            )
+                        })
+                    .catch(error => console.log(error))
+            }
+        })
         .catch(error => console.log(error))
+    }
 })
 
 app.get('/end/:id',(req,res) => {
@@ -62,11 +84,10 @@ app.get('/:newURL',(req,res) => {
     const newURL = 'http://localhost:3000/'+req.params.newURL
     URL.find()
         .lean()
-        .then(urls => urls.forEach(url => {
-            if (url.newURL === newURL) {
-                 res.redirect(url.URL,302)
-            }       
-            }))
+        .then(urls => {
+            let information = urls.find(url => url.newURL === newURL)
+            res.redirect(`${information.URL}`,302)
+        } )
         .catch(error => console.log(error))          
 })
 
