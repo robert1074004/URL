@@ -28,5 +28,8 @@
 [Node.js](https://nodejs.org/en/)
 [Robo3T](https://blog.robomongo.org/studio3t-free/)
 
+## 環境變數設置
+MONGODB_URI = mongodb://localhost/URL
+
 ## 開發人員
 Robert
