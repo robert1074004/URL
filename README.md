@@ -29,7 +29,8 @@
 [Robo3T](https://blog.robomongo.org/studio3t-free/)
 
 ## 環境變數設置
-MONGODB_URI = mongodb://localhost/URL
+到電腦的控制台搜尋'環境'，按下編輯系統環境變數，在系統變數新增MONGODB_URI(變數名稱)mongodb://localhost/URL(變數值)
 
+MONGODB_URI = mongodb://localhost/URL
 ## 開發人員
 Robert
